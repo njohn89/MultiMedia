@@ -3,8 +3,8 @@ var meat;
 var spelunky;
 var green;
 var speed;
-var meatcharacter;
-var spulunkycharacter;
+var meatSprite;
+var spelunkySprite;
 var greenSptite;
 var lastPosition // for resting direction
 
@@ -21,12 +21,12 @@ function setup() {
   createCanvas(1600, 1000);
   frameRate(18);
 
-  meatcharacter = new character(5, 5, meat);
-  spulunkycharacter = new character(200, 200, spelunky);
-  greenSptite = new character(400, 20, green);
+  meatSprite = new Sprite(5, 5, meat);
+  spelunkySprite = new Sprite(200, 200, spelunky);
+  greenSptite = new Sprite(400, 20, green);
 
-  meatcharacter.load();
-  spulunkycharacter.load();
+  meatSprite.load();
+  spelunkySprite.load();
   greenSptite.load();
 
 
@@ -42,24 +42,24 @@ function draw() {
 
   if (keyIsPressed && keyCode == LEFT_ARROW) {
     scale(-1, 1);
-    meatcharacter.walk();
-    spulunkycharacter.walk();
+    meatSprite.walk();
+    spelunkySprite.walk();
     greenSptite.walk();
 
   } else if (keyIsPressed) {
-    meatcharacter.walk();
-    spulunkycharacter.walk();
+    meatSprite.walk();
+    spelunkySprite.walk();
     greenSptite.walk();
 
 
   } else if (lastPosition == 3) {
     scale(-1, 1);
-    meatcharacter.walk();
-    spulunkycharacter.walk();
+    meatSprite.walk();
+    spelunkySprite.walk();
     greenSptite.walk();
   } else {
-    meatcharacter.walk();
-    spulunkycharacter.walk();
+    meatSprite.walk();
+    spelunkySprite.walk();
     greenSptite.walk();
   }
 
@@ -69,11 +69,12 @@ function draw() {
 
 
 
-function character(startX, startY, temp) {
+function Sprite(startX, startY, temp) {
 
-  this.xPosition = startX; this.yPosition = startY;
+  this.xPosition = startX; 
+  this.yPosition = startY;
   this.lastPosition = 1;  // 1, 2, 3, 4 = right, down, left, up 
-  this.character = temp;
+  this.sprite = temp;
   var walkUp = [];
   var walkDown = [];
   var walkRight = [];
@@ -83,15 +84,15 @@ function character(startX, startY, temp) {
 
 
   this.load = function () {
-    var characterWidth = 80;
+    var spriteWidth = 80;
     for (i = 0; i < 6; i++) {
-      walkUp[i] = this.character.get(i * characterWidth, 400, 80, 80);
-      walkDown[i] = this.character.get(i * characterWidth + 480, 400, 80, 80);
+      walkUp[i] = this.sprite.get(i * spriteWidth, 400, 80, 80);
+      walkDown[i] = this.sprite.get(i * spriteWidth + 480, 400, 80, 80);
     }
     for (i = 0; i < 8; i++) {
-      walkRight[i] = this.character.get(i * characterWidth, 0, 80, 80);
-      walkLeft[i] = this.character.get(i * characterWidth, 0, 80, 80);
-      stumble[i] = this.character.get(i * characterWidth, 160, 80, 80);
+      walkRight[i] = this.sprite.get(i * spriteWidth, 0, 80, 80);
+      walkLeft[i] = this.sprite.get(i * spriteWidth, 0, 80, 80);
+      
     }
   }
 
@@ -136,9 +137,5 @@ function character(startX, startY, temp) {
 
 
   }
-
-
-
-
-
 }
+
