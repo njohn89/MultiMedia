@@ -32,7 +32,7 @@ function setup() {
 
 function draw() {
   background(255);
-  image(walkUp[frame], this.xPosition, this.yPosition, 80, 80);
+  image(moveUp[frame], this.xPosition, this.yPosition, 80, 80);
 
 }
 
@@ -46,23 +46,23 @@ function Sprite(startX, startY, temp) {
   this.yPosition = startY;
   this.lastPosition = 1;  // 1, 2, 3, 4 = right, down, left, up 
   this.sprite = temp;
-  var walkUp = [];
-  var walkDown = [];
-  var walkRight = [];
-  var walkLeft = [];
+  var moveUp = [];
+  var moveDown = [];
+  var moveRight = [];
+  var moveLeft = [];
   
 
 
 
   this.load = function () {
     var spriteWidth = 80;
-    walkDown =  this.sprite.get(spriteWidth, 400, 80, 80);
+    moveDown =  this.sprite.get(spriteWidth, 400, 80, 80);
   }
 
 
 
 
-  this.walk = function () {
+  this.move = function () {
     
   }
 }
