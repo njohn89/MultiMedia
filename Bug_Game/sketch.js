@@ -1,15 +1,13 @@
 //Nicholas Johnson
 var snake;
-var spelunky;
-var green;
+
 var speed;
 var snakeSprite;
-var spelunkySprite;
-var greenSptite;
+
 var lastPosition // for resting direction
 
 function preload() {
-  snake = loadImage("snake.png");
+  snake = loadImage("monkeyRight.png");
 }
 
 function setup() {
@@ -17,7 +15,9 @@ function setup() {
   createCanvas(1600, 1000);
   frameRate(18);
 
-  snakeSpriteDown = new Sprite(5, 5, snake);
+  snakeSprite = new Sprite(5, 5, snake);
+  snakeSprite.load();
+  //snakeright
   
 
   
@@ -32,7 +32,8 @@ function setup() {
 
 function draw() {
   background(255);
-  image(moveUp[frame], this.xPosition, this.yPosition, 80, 80);
+  //image(moveUp[frame], this.xPosition, this.yPosition, 80, 80);
+  snakeSprite.move();
 
 }
 
@@ -56,14 +57,18 @@ function Sprite(startX, startY, temp) {
 
   this.load = function () {
     var spriteWidth = 80;
-    moveDown =  this.sprite.get(spriteWidth, 400, 80, 80);
+    
+    for (i = 0; i < 5; i++) {
+      moveRight[i] = this.sprite.get(i * spriteWidth, 0, 80, 80);
+    }
   }
 
 
 
 
   this.move = function () {
-    
+    //this.xPosition = this.xPosition + speed;
+    image(moveRight[0], this.xPosition, this.yPosition, 80, 80);
   }
 }
 
