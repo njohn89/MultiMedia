@@ -6,7 +6,7 @@ var speed;
 var meatSprite;
 var spelunkySprite;
 var greenSptite;
-var lastPosition // for resting direction
+var lastPosition; // for resting direction
 
 function preload() {
   spelunky = loadImage("spelunky.png");
