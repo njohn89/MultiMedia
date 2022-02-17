@@ -24,7 +24,7 @@ function setup() {
   
   for(i = 0; i<4; i++) right.push(new Sprite(-100 - random(750), (i * 100) +200 + random(150), monkey ));
 
-  for(i = 0; i<4; i++) down.push(new BugDown((i*190) + 470, -275 - random(1000), monkeyDown));
+  for(i = 0; i<4; i++) down.push(new BugDown((i*190) + 470, -275 - random(100), monkeyDown));
   
 
   for(i in right) right[i].load();
@@ -61,8 +61,8 @@ function draw() {
   background(255);
   
   //right[1].test();
-  for(i in right) right[i].move();
-  //for(i in down) down[i].move();
+  //for(i in right) right[i].move();
+  for(i in down) down[i].move();
   //monkeySprite.test();
   //down[0].test();
   
@@ -92,9 +92,6 @@ function Sprite(startX, startY, temp) {
   }
   
   
-
-
-
   this.load = function () {
     var spriteWidth = 80;
     
@@ -107,30 +104,31 @@ function Sprite(startX, startY, temp) {
 
   }
 
-
-
    /// move right across screen
   this.move = function () {
-    
+
     if(this.dead){
-      if(this.squashDelay <= 2){
+      if(this.squashDelay <= 4){
         image(squash[0], this.xPosition, this.yPosition, 80, 80);
         this.squashDelay++;
-        return;
-      }
-      if(this.squashDelay > 2){
-        image(squash[1], this.xPosition, this.yPosition, 80, 80);
-        this.squashDelay++;
-        return;
       }
       if(this.squashDelay > 4){
+        image(squash[1], this.xPosition, this.yPosition, 80, 80);
+        this.squashDelay++;
+        
+      }
+      if(this.squashDelay > 7){
         this.squashDelay = 0;
         this.xPosition = -250 - random(450);
         this.yPosition = this.yPosition + random(-50, 50);
         this.dead = false;
-        return;
       }
+
+      return;
+
      }
+
+    else {
      
     if (this.xPosition < canvasX){
       this.xPosition = this.xPosition + this.speed;
@@ -141,7 +139,7 @@ function Sprite(startX, startY, temp) {
       this.yPosition = this.yPosition + random(-80, 80);
       this.speed = this.speed + random(-1, 1);
     }
-    if(mouseIsPressed){
+    if(mouseIsPressed) {
       if(mouseX <= this.xPosition + 83 && mouseX >= this.xPosition){
         if(mouseY <= this.yPosition +83 && mouseY >= this.xPosition){
           image(squash[0], this.xPosition, this.yPosition, 80, 80);
@@ -151,6 +149,7 @@ function Sprite(startX, startY, temp) {
         }
       }
     }
+  }
   }
   
 
@@ -166,7 +165,9 @@ function BugDown(startX, startY, temp) {
   this.yPosition = startY;
   var moveDown = [];
   this.sprite = temp;
-  var squash  = []
+  squash  = [];
+  this.squashDelay = 0;
+  this.dead=false;
 
   this.test = function () {
     
@@ -188,14 +189,44 @@ function BugDown(startX, startY, temp) {
   }
 
   //
-  this.move = function () {     
-    
-    if (this.yPosition < 1000){
-     this.yPosition = this.yPosition + speed; 
-     image(moveDown[frameCount % 5], this.xPosition, this.yPosition, 80, 80);
+  this.move = function () {  
+    if(this.dead){
+      if(this.squashDelay <= 4){
+        image(squash[0], this.xPosition, this.yPosition, 80, 80);
+        this.squashDelay++;
+      }
+
+      if(this.squashDelay > 4){
+        image(squash[1], this.xPosition, this.yPosition, 80, 80);
+        this.squashDelay++;
+      }
+
+      if(this.squashDelay > 7){
+        this.squashDelay = 0;
+        this.xPosition = -250 - random(450);
+        this.yPosition = this.yPosition + random(-50, 50);
+      }
+
+      return;
     }
-   }
 
-}
+    else {
 
+     if (this.yPosition < 1000){
+        this.yPosition = this.yPosition + speed; 
+        image(moveDown[frameCount % 5], this.xPosition, this.yPosition, 80, 80);
+      }
 
+      else{
+        this.yPosition = -300 - random(400);
+      }
+
+      if(mouseIsPressed) {
+        if(mouseX <= this.xPosition + 83 && mouseX >= this.xPosition){
+          if(mouseY <= this.yPosition +83 && mouseY >= this.xPosition){
+            image(squash[0], this.xPosition, this.yPosition, 80, 80);
+            this.squashDelay++;
+            this.dead = true;
+   } }
+
+}}}}
