@@ -5,6 +5,8 @@ var speed;
 var monkeySprite;
 var right = [];
 var down = [];
+var totalDead = 0;
+var timer = 30;
 
 
 var lastPosition // for resting direction
@@ -60,8 +62,28 @@ function setup() {
 function draw() {
   background(255);
   
+  textAlign(RIGHT, TOP);
+  textSize(20);
+  text(timer, canvasX - 50, 50);
+  if(frameCount % 18 == 0 && timer > 0) timer--;
+
+  textAlign(LEFT, TOP);
+  textSize(20);
+  text(totalDead, 50, 50);
+
+  if(timer == 0){
+    
+    stroke(color(0));
+    fill('red');
+    rect(250, 250, 700, 700);
+
+    noLoop();
+    return;
+
+  }
+  
   //right[1].test();
-  //for(i in right) right[i].move();
+  for(i in right) right[i].move();
   for(i in down) down[i].move();
   //monkeySprite.test();
   //down[0].test();
@@ -69,7 +91,9 @@ function draw() {
 
 }
 
-
+function Timer(){
+  this.start = 30;
+}
 
 
 //move right class
@@ -119,9 +143,11 @@ function Sprite(startX, startY, temp) {
       }
       if(this.squashDelay > 7){
         this.squashDelay = 0;
+        this.speed = this.speed + random(1, 5);
         this.xPosition = -250 - random(450);
         this.yPosition = this.yPosition + random(-50, 50);
         this.dead = false;
+
       }
 
       return;
@@ -140,16 +166,18 @@ function Sprite(startX, startY, temp) {
       this.speed = this.speed + random(-1, 1);
     }
     if(mouseIsPressed) {
-      if(mouseX <= this.xPosition + 83 && mouseX >= this.xPosition){
-        if(mouseY <= this.yPosition +83 && mouseY >= this.xPosition){
+      if(mouseX <= this.xPosition+90 && mouseX >= this.xPosition){
+        if(mouseY <= this.yPosition+90 && mouseY >= this.yPosition){
           image(squash[0], this.xPosition, this.yPosition, 80, 80);
           this.squashDelay++;
           this.dead = true;
+          totalDead++;
 
         }
       }
     }
   }
+
   }
   
 
@@ -190,6 +218,7 @@ function BugDown(startX, startY, temp) {
 
   //
   this.move = function () {  
+
     if(this.dead){
       if(this.squashDelay <= 4){
         image(squash[0], this.xPosition, this.yPosition, 80, 80);
@@ -223,10 +252,12 @@ function BugDown(startX, startY, temp) {
 
       if(mouseIsPressed) {
         if(mouseX <= this.xPosition + 83 && mouseX >= this.xPosition){
-          if(mouseY <= this.yPosition +83 && mouseY >= this.xPosition){
+          if(mouseY <= this.yPosition +83 && mouseY >= this.yPosition){
             image(squash[0], this.xPosition, this.yPosition, 80, 80);
             this.squashDelay++;
             this.dead = true;
-   } }
+            totalDead++
+   }
+   }
 
 }}}}
