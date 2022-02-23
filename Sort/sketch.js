@@ -6,6 +6,7 @@ function setup() {
   winW = $(window).width();
   createCanvas(winW-100, winH-100);
   strokeWeight(1);
+  dropOne = new Drop(10, 10);
   //background(255);
   
   //console.log(winH);
@@ -13,11 +14,10 @@ function setup() {
 }
 function draw() {
   //createCanvas(winW-100, winH-100);
-  dropOne = new Drop(10, 10);
+  
+  dropOne.fall();
 
-  //for(i = 0; i<10; i++) {
-  //  dropOne.fall();
-  //}
+  
   
   //stroke("red");
   //strokeWeight(0.0125);
@@ -26,19 +26,25 @@ function draw() {
 
 
 function Drop(xPos, yPos){
+  this.fallSpeed = 10.00;
   this.x = xPos;
   this.y = yPos;
   this.size = 10;
-  stroke("red");
+  stroke("purple");
   this.thisLine = line(this.x, this.y, this.x+10, this.y+10);
 
   this.fall = function() {
     //console.log("&&");
     
     
-    while(this.x < winH) {
-      console.log("&&");
+    if(this.y < winH) {
+      //console.log("&&");
+      
+      
+      
       line(this.x, this.y, this.x+10, this.y+10);
+      this.y = this.y + this.fallSpeed;
+      this.fallSpeed = this.fallSpeed + 0.5;
 
     }
 
