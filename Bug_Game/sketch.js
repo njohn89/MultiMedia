@@ -7,6 +7,7 @@ var right = [];
 var down = [];
 var totalDead = 0;
 var timer = 30;
+var squashNoise;
 
 
 var lastPosition // for resting direction
@@ -20,6 +21,22 @@ function preload() {
 
 function setup() {
 
+
+  squashNoise = new Tone.Synth({
+    oscillator: { type: "square" }
+  }).toMaster()
+  squashNoise.frequency.value = 200;
+
+  const pingPong = new Tone.PingPongDelay("4n", 0.2).toMaster()
+  const synth = new Tone.Synth().connect(pingPong);
+  const seq = new Tone.Sequence((time, note) => {
+	synth.triggerAttackRelease(note, 0.1, time);
+	// subdivisions are given as subarrays
+}, ["C4", ["C3", "G4"], "G4", ["A4", "G4", "E4"], "G4"]).start(0);
+
+//Tone.Transport.start();
+  
+
   canvasX = 1000;
   createCanvas(canvasX, 750);
   frameRate(18);
@@ -32,26 +49,6 @@ function setup() {
   for(i in right) right[i].load();
   for(i in down) down[i].load();
   
-
-  //monkeySprite = new Sprite(0, 300, monkey);
-  //monkeySprite2 = new Sprite(0, 100, monkey);
-  //monkeySprite3 = new Sprite(0, 600, monkey);
-
-  
-  //monkeyDown = new BugDown(25, 0, monkeyDown);
-
-  //monkeySprite.load();
-  //monkeySprite2.load();
-  //monkeySprite3.load();
-
-  //monkeyDown.load();
-
-  //monkeyright
-  
-
-  
-
-
   //Speed
   speed = 10;
 
@@ -60,6 +57,10 @@ function setup() {
 }
 
 function draw() {
+  if(frameCount == 1){
+    //Tone.Transport.start();
+  }  
+
   background(255);
   
   textAlign(RIGHT, TOP);
@@ -111,7 +112,6 @@ function Sprite(startX, startY, temp) {
 
   this.test = function () {
     for(i = 0; i<6; i++)
-    //image(moveRight[i], 310 + i*100, 100, 80, 80);
     image(squash[1], 310 + i*100, 100, 80, 80);
   }
   
@@ -121,7 +121,6 @@ function Sprite(startX, startY, temp) {
     
     for (i = 0; i < 6; i++) {
       moveRight[i] = this.sprite.get(i * spriteWidth, 0, 80, 80);
-      //moveDown[i] = this.sprite.get(i * spriteWidth, 0, 80, 80);
     }
     squash.push(this.sprite.get(5*spriteWidth, 80, 80, 80));
     squash.push(this.sprite.get(5*spriteWidth, 160, 80, 80))
@@ -133,6 +132,7 @@ function Sprite(startX, startY, temp) {
 
     if(this.dead){
       if(this.squashDelay <= 4){
+        
         image(squash[0], this.xPosition, this.yPosition, 80, 80);
         this.squashDelay++;
       }
@@ -149,7 +149,6 @@ function Sprite(startX, startY, temp) {
         this.dead = false;
 
       }
-
       return;
 
      }
@@ -166,12 +165,16 @@ function Sprite(startX, startY, temp) {
       this.speed = this.speed + random(-1, 1);
     }
     if(mouseIsPressed) {
+      squashNoise.triggerAttackRelease(190, 0.06);
       if(mouseX <= this.xPosition+90 && mouseX >= this.xPosition){
         if(mouseY <= this.yPosition+90 && mouseY >= this.yPosition){
+          
           image(squash[0], this.xPosition, this.yPosition, 80, 80);
           this.squashDelay++;
           this.dead = true;
           totalDead++;
+          
+          
 
         }
       }
