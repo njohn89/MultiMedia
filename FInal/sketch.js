@@ -30,6 +30,8 @@ var switchDirection = 1;
 
 var X;
 var Y;
+var B;
+var buttonLatch = false;
 var strTest = 'X:20';
 var parse;
 var sw; 
@@ -159,6 +161,7 @@ function setup() {
         if(currentString.charAt(0) == 'X') X = parseInt(currentString.replace(/[A-Za-z$]/g, "")); 
         if(currentString.charAt(0) == 'Y') Y = parseInt(currentString.replace(/[A-Za-z$]/g, ""));
         if(currentString.charAt(0) == 'S') sw = parseInt(currentString.replace(/[A-Za-z$]/g, ""));
+        if(currentString.charAt(0) == 'B') B = parseInt(currentString.replace(/[A-Za-z$]/g, "")); 
     
         //console.log(currentString); // println the string
         
@@ -190,6 +193,7 @@ function setup() {
             console.log("delayTime", pingPong.delayTime.value);
             console.log("seq -> ", seq.loopStart, seq.loopEnd);
             console.log("part -> ", part.loopStart, part.loopEnd);
+            console.log("Butt -> ", B);
             //console.log("Dir ->", switchDirection);
             //console.log("SW_LOCK -> ", swLock);
             //console.log("Y -> ", rectY);
