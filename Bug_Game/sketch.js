@@ -9,6 +9,25 @@ var totalDead = 0;
 var timer = 30;
 var squashNoise;
 
+//Serial Communication
+var cursorRect;
+var serial;
+var num;
+var latestData = 'waiting for data'; // you'll use this to write incoming data to the canvas
+const portName = 'COM3'; // fill in your serial port name here
+var rectX = 200;
+var rectY = 500;
+var X;
+var Y;
+var strTest = 'X:20';
+var parse;
+var sw; 
+var r = 0, g = 20, b = 20;
+var hold = false;
+var click = false;
+var frameAtClick = 0;
+var auxFrame;
+
 
 var lastPosition // for resting direction
 
@@ -21,24 +40,75 @@ function preload() {
 
 function setup() {
 
+  paint = color(0, 0, 0);
+	//console.log(strTest);
+	//var newStr = strTest.replace( /[^\d.]/g, '' );
+	//console.log(newStr);
+	//parse = parseInt(newStr);
+	//console.log(parse);
+  createCanvas(windowHeight, windowHeight);
+  
+  serial = new p5.SerialPort();
+
+	// Get a list the ports available
+	// You should have a callback defined to see the results
+	serial.list();
+
+	// Assuming our Arduino is connected, let's open the connection to it
+	// Change this to the name of your arduino's serial port
+	serial.open(portName);
+
+	// Here are the callbacks that you can register
+
+	// When we connect to the underlying server
+	serial.on('connected', serverConnected);
+
+	// When we get a list of serial ports that are available
+	serial.on('list', gotList);
+	// OR
+	//serial.onList(gotList);
+
+	// When we some data from the serial port
+	serial.on('data', gotData);
+	// OR
+	//serial.onData(gotData);
+
+	// When or if we get an error
+	serial.on('error', gotError);
+	// OR
+	//serial.onError(gotError);
+
+	// When our serial port is opened and ready for read/write
+	serial.on('open', gotOpen);
+	// OR
+	//serial.onOpen(gotOpen);
+
+	// Callback to get the raw data, as it comes in for handling yourself
+	//serial.on('rawdata', gotRawData);
+	// OR
+	//serial.onRawData(gotRawData);
+
+
+
+
 
   squashNoise = new Tone.Synth({
     oscillator: { type: "square" }
   }).toMaster()
   squashNoise.frequency.value = 200;
 
-  const pingPong = new Tone.PingPongDelay("4n", 0.2).toMaster()
+  const pingPong = new Tone.PingPongDelay("6n", 0.3).toMaster()
   const synth = new Tone.Synth().connect(pingPong);
   const seq = new Tone.Sequence((time, note) => {
 	synth.triggerAttackRelease(note, 0.1, time);
 	// subdivisions are given as subarrays
-}, ["C4", ["C3", "G4"], "G4", ["A4", "G4", "E4"], "G4"]).start(0);
+}, ["C4", ["C3", "G4"], "G4", "", ["A4", "G4", "E4"], "G4"]).start(0);
 
-//Tone.Transport.start();
+Tone.Transport.start();
   
 
   canvasX = 1000;
-  createCanvas(canvasX, 750);
+  createCanvas(windowWidth, windowHeight);
   frameRate(18);
   
   for(i = 0; i<4; i++) right.push(new Sprite(-100 - random(750), (i * 100) +200 + random(150), monkey ));
@@ -50,23 +120,100 @@ function setup() {
   for(i in down) down[i].load();
   
   //Speed
-  speed = 10;
-
+  speed = 4;
 
 
 }
 
+//
+// We are connected and ready to go
+function serverConnected() {
+	print('Connected to Server');
+}
+
+// Got the list of ports
+function gotList(thelist) {
+	print('List of Serial Ports:');
+	// theList is an array of their names
+	for (var i = 0; i < thelist.length; i++) {
+		// Display in the console
+		print(i + ' ' + thelist[i]);
+	}
+}
+
+// Connected to our serial device
+function gotOpen() {
+	print('Serial Port is Open');
+}
+
+// Ut oh, here is an error, let's log it
+function gotError(theerror) {
+	print(theerror);
+}
+
+// There is data available to work with from the serial port
+function gotData() {
+	var currentString = serial.readLine(); // read the incoming string
+	trim(currentString); // remove any trailing whitespace
+	if (!currentString) return; // if the string is empty, do no more
+	if(currentString.charAt(0) == 'X') X = parseInt(currentString.replace(/[A-Za-z$]/g, "")); 
+	if(currentString.charAt(0) == 'Y') Y = parseInt(currentString.replace(/[A-Za-z$]/g, ""));
+	if(currentString.charAt(0) == 'S') sw = parseInt(currentString.replace(/[A-Za-z$]/g, ""));
+
+	//console.log(currentString); // println the string
+	
+  latestData = currentString; // save it for the draw method
+}
+
+// We got raw from the serial port
+function gotRawData(thedata) {
+	print('gotRawData' + thedata);
+}
+//
+
+
 function draw() {
+  
+
   if(frameCount == 1){
-    //Tone.Transport.start();
+    Tone.Transport.start();
+  }
+  if(hold && frameCount % 3 == 0){
+    if(sw){
+      hold = false;
+      click = false;
+      console.log("RELEASE");
+    }
   }  
 
-  background(255);
+  background(255, 255, 180);
   
   textAlign(RIGHT, TOP);
   textSize(20);
   text(timer, canvasX - 50, 50);
   if(frameCount % 18 == 0 && timer > 0) timer--;
+
+  if(X){
+    rectX += (12*X);
+  }
+  if(Y){
+    rectY += (12*Y);
+  }
+  if(!sw && frameCount - frameAtClick > 9 && !hold){
+    
+    console.log("CLICK");
+    frameAtClick = frameCount;
+    hold = true;
+    click = true;
+    
+
+
+  }
+
+  cursorRect = rect(rectX, rectY, 9, 9);
+  cursorRect.fill("black")
+
+
 
   textAlign(LEFT, TOP);
   textSize(20);
@@ -95,11 +242,14 @@ function draw() {
 function Timer(){
   this.start = 30;
 }
+function Attack(){
+  console.log("ATTACK");
+}
 
 
 //move right class
 function Sprite(startX, startY, temp) {
-  this.speed = random(6, 12);
+  this.speed = random(2, 4);
   this.xPosition = startX; 
   this.yPosition = startY;
   this.lastPosition = 1;  // 1, 2, 3, 4 = right, down, left, up 
@@ -164,10 +314,13 @@ function Sprite(startX, startY, temp) {
       this.yPosition = this.yPosition + random(-80, 80);
       this.speed = this.speed + random(-1, 1);
     }
-    if(mouseIsPressed) {
-      squashNoise.triggerAttackRelease(190, 0.06);
-      if(mouseX <= this.xPosition+90 && mouseX >= this.xPosition){
-        if(mouseY <= this.yPosition+90 && mouseY >= this.yPosition){
+    if(click) {
+      
+      cick = false;
+      if(frameAtClick - frameCount == 0) squashNoise.triggerAttackRelease(170, 0.05);
+      //console.log("Delat YEst");
+      if(rectX+3 <= this.xPosition+90 && rectX+3 >= this.xPosition){
+        if(rectY+3 <= this.yPosition+90 && rectY+3 >= this.yPosition){
           
           image(squash[0], this.xPosition, this.yPosition, 80, 80);
           this.squashDelay++;
@@ -253,14 +406,23 @@ function BugDown(startX, startY, temp) {
         this.yPosition = -300 - random(400);
       }
 
-      if(mouseIsPressed) {
-        if(mouseX <= this.xPosition + 83 && mouseX >= this.xPosition){
-          if(mouseY <= this.yPosition +83 && mouseY >= this.yPosition){
+      if(click) {
+      
+        cick = false;
+        if(frameAtClick - frameCount == 0) squashNoise.triggerAttackRelease(170, 0.05);
+        //console.log("Delat YEst");
+        if(rectX+3 <= this.xPosition+90 && rectX+3 >= this.xPosition){
+          if(rectY+3 <= this.yPosition+90 && rectY+3 >= this.yPosition){
+            
             image(squash[0], this.xPosition, this.yPosition, 80, 80);
             this.squashDelay++;
             this.dead = true;
-            totalDead++
-   }
-   }
+            totalDead++;
+            
+            
+  
+          }
+        }
+      }
 
-}}}}
+}}}
