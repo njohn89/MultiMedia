@@ -102,7 +102,7 @@ function setup() {
   const seq = new Tone.Sequence((time, note) => {
 	synth.triggerAttackRelease(note, 0.1, time);
 	// subdivisions are given as subarrays
-}, ["C4", ["C3", "G4"], "G4", "", ["A4", "G4", "E4"], "G4"]).start(0);
+}, ["C3", ["G4", "G4", "G4"], "", "", ["A3", "G3", "E3"], "G4"]).start(0);
 
 Tone.Transport.start();
   
